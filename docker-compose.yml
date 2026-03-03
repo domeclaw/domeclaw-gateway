@@ -1,0 +1,36 @@
+services:
+  # --- Redis สำหรับเก็บ Token Usage และทำ Auto Reset ---
+  redis:
+    image: redis:alpine
+    container_name: api-gateway-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+    networks:
+      domeclaw-net:
+        ipv4_address: 172.20.0.10
+    restart: unless-stopped
+
+  # --- OpenResty (Nginx + Lua) ---
+  gateway:
+    image: openresty/openresty:alpine
+    container_name: api-gateway-proxy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+    environment:
+      - ALICLOUD_API_KEY=${ALICLOUD_API_KEY:-your-sk-here}
+    depends_on:
+      - redis
+    networks:
+      - domeclaw-net
+    restart: unless-stopped
+
+networks:
+  domeclaw-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

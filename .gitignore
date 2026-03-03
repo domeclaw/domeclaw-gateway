@@ -1,0 +1,17 @@
+# Environment variables
+.env
+
+# Redis data
+redis_data/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
